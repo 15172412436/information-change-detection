@@ -1,0 +1,278 @@
+definitions:
+  api.auth:
+    properties:
+      password:
+        description: PassWord 密码
+        example: zhangsan
+        type: string
+      username:
+        description: UserName 用户名
+        example: zhangsan
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  api.phone:
+    properties:
+      code:
+        description: Code 手机号验证码
+        example: "123456"
+        type: string
+      phone:
+        description: Phone 手机号
+        example: "13938738804"
+        type: string
+    required:
+    - code
+    - phone
+    type: object
+  api.token:
+    properties:
+      token:
+        type: string
+    type: object
+  v1.AddSubForm:
+    properties:
+      content:
+        description: 订阅链接-主题或者链接
+        example: url or Subject
+        type: string
+      email:
+        description: 邮箱
+        example: zhuge666@qq.com
+        type: string
+      frequency:
+        description: 频率
+        example: everyday
+        type: string
+      keyword:
+        description: 关键词 仅在type 为 ztdy 存在
+        type: string
+      set_time:
+        description: set_time
+        example: 12
+        type: integer
+      sub_type:
+        description: 订阅类型 两种 dtdy或fcdy
+        example: dtdy
+        type: string
+      uid:
+        description: 用户id
+        example: 13
+        type: integer
+    type: object
+  v1.EditSubForm:
+    properties:
+      content:
+        description: 订阅链接-主题或者链接
+        example: url or subject
+        type: string
+      email:
+        description: 邮箱
+        example: zhuge666@qq.com
+        type: string
+      frequency:
+        description: 频率
+        example: everyday
+        type: string
+      keyword:
+        description: 关键词 仅存在ztdy
+        type: string
+      set_time:
+        description: set_time
+        example: 12
+        type: integer
+      sub_type:
+        description: 订阅类型 两种 dtdy或fcdy
+        example: dtdy
+        type: string
+      subscription_id:
+        description: 订阅id 用于修改
+        example: 12_dtdy
+        type: string
+      uid:
+        description: 用户id
+        example: 13
+        type: integer
+    type: object
+  v1.result:
+    properties:
+      id:
+        description: 结果id
+        example: 10
+        type: integer
+      sub_type:
+        description: 订阅类型 三种：fcdy dtdy ztdy
+        example: dtdy
+        type: string
+    type: object
+info:
+  contact: {}
+  license: {}
+paths:
+  /api/v1/results:
+    post:
+      parameters:
+      - description: 标记已读的内容
+        in: body
+        name: result
+        required: true
+        schema:
+          $ref: '#/definitions/v1.result'
+      produces:
+      - application/json
+      summary: 标记已读的内容
+      tags:
+      - result
+  /api/v1/results/{subscription_id}:
+    get:
+      parameters:
+      - description: 放在链接中get请求：如 http://127.0.0.1:8000/api/v1/results/25_ztdy
+        in: path
+        name: subscription_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      summary: 获取结果
+      tags:
+      - result
+  /api/v1/subs_service:
+    post:
+      parameters:
+      - description: 订阅信息
+        in: body
+        name: subs
+        required: true
+        schema:
+          $ref: '#/definitions/v1.AddSubForm'
+      produces:
+      - application/json
+      summary: 增加订阅
+      tags:
+      - subscription
+  /api/v1/subs_service/:
+    put:
+      parameters:
+      - description: 订阅信息
+        in: body
+        name: subs
+        required: true
+        schema:
+          $ref: '#/definitions/v1.EditSubForm'
+      produces:
+      - application/json
+      summary: 修改订阅
+      tags:
+      - subscription
+  /api/v1/subs_service/{subscription_id}:
+    delete:
+      parameters:
+      - description: ID
+        in: path
+        name: subscription_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      summary: 删除订阅
+      tags:
+      - subscription
+  /api/v1/subs_service/{uid}:
+    get:
+      parameters:
+      - description: ID
+        in: path
+        name: uid
+        required: true
+        type: integer
+      produces:
+      - application/json
+      summary: 获取订阅
+      tags:
+      - subscription
+  /auth/code:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      parameters:
+      - description: 手机号
+        in: formData
+        name: phone
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"data":{},"msg":"ok"}'
+          schema:
+            type: string
+      summary: 发送手机验证码
+      tags:
+      - auth
+  /auth/login:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      parameters:
+      - description: 用户信息
+        in: body
+        name: auth
+        required: true
+        schema:
+          $ref: '#/definitions/api.auth'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"data":{},"msg":"ok"}'
+          schema:
+            $ref: '#/definitions/api.token'
+      summary: 账号密码登录
+      tags:
+      - auth
+  /auth/phoneLogin:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      parameters:
+      - description: 手机号快速登录/注册
+        in: body
+        name: auth
+        required: true
+        schema:
+          $ref: '#/definitions/api.phone'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"data":{"token":token},"msg":"ok"}'
+          schema:
+            type: string
+      summary: 手机号快速登陆/注册
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      parameters:
+      - description: 账号密码登录/注册
+        in: body
+        name: auth
+        required: true
+        schema:
+          $ref: '#/definitions/api.auth'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":200,"data":{"token":token},"msg":"ok"}'
+          schema:
+            type: string
+      summary: 账号密码注册
+      tags:
+      - auth
+swagger: "2.0"
